@@ -8,30 +8,12 @@
     - Ta nhận thấy vì tam giác có 1 đỉnh song song với trục Oy ==> ta dùng công thức tính tam giác
     S = 1/2*a*h
     - Ta sẽ duyệt ờ mỗi cột để tìm ra chiều dài lớn nhất của đáy và 2 đỉnh tạo nên đáy sẽ khác màu nhau
-    ===> ta cần lưu trữ lại độ dài và 2 màu đó là 2 màu gì ==> để tìm được màu còn lại là đỉnh của tam giác (1)
-    ---> xử lí bằng cách gán các đỉnh lại bằng 1 số ===> khi tìm đỉnh còn lại trên tam giác thì dễ tìm hơn
-    (Ở đây làm sao ta làm được điều này ---> ta sẽ chọn mốc 1 trong 2 đầu để tìm, để tìm sao cho đáy là lớn
-    nhất
-    để ý ở đây có 1 trường hợp đặc biệt, nếu có 2 cặp mốc thoả mãn điều này, khi này xảy ra trường hợp:
-    + Lấy cặp mốc 1: (R,B) --> lỡ ở đỉnh xa nhất ko có G
-    + Lấy cặp mốc 2: (G,B) hoặc (G,R) --> ở đỉnh xa nhất có đỉnh còn lại là B hoặc R 
-    ===> nếu lấy cặp mốc 1 thì ta sai ==> ta phải cover case này nữa.
-    )
-    
-    - Sau đó thì ta duyệt qua các cột, và tìm đỉnh còn lại ở các cột khác (không trùng với cột đang xét làm 
-    đáy). Ở đây chọn đỉnh nào khác màu 2 đỉnh làm đáy đều được --> vì cơ bản h không đổi --> giống nhau:
-    
-    TH đặc biệt: tất cả các đỉnh đều 1 màu, hoặc không tạo nên được tam giác nào thoả mãn (ví dụ chỉ
-    có 2 đỉnh khác, không thoả mãn song song với Oy)
-    ---> (1) sẽ xử lí
-    
-    Ta quy đổi: R - 1
-                G - 2
-                B - 3
+    - Ở đây ta sẽ lưu lại theo hàng của col với 0 là r, 1 là g, 2 là b ---> để lấy được vị trí col
+    - bài này ý tưởng sẽ là ko cần biết 3 màu ở 3 đỉnh là gì, chỉ cần biết nó maximum
 Constraint:
     2 <= N, M <= 10^3
 Độ phức tạp:
-    Thời gian: O(M*N)
+    Thời gian: O(M*N+M*M) -- giả sử N >= M ==> O(N*N)
     Không gian: O(3M)
 */
 int calculate(int base, int curr_col, vector<int> col)
@@ -41,7 +23,7 @@ int calculate(int base, int curr_col, vector<int> col)
     int max_area = INT_MIN, curr_area;
 
     for (int j = 0; j < M; j++)
-        if (col[j])
+        if (col[j] && j != curr_col)
         {
             height = abs(j - curr_col) + 1;
             curr_area = ceil(height * base / double(2));
@@ -51,6 +33,9 @@ int calculate(int base, int curr_col, vector<int> col)
 }
 int Solution::solve(vector<string> &A) {
     int N = A.size(), M = A[0].size();
+    
+    // vector lưu trữ các màu theo cột :)) nghĩa là màu nào có thì cột đó có col[k][j] tương ứng với cột j
+    // với k = 0 - red, k = 1 - green, k = 2 - blue
     vector<vector<int> > col(3, vector<int> (M, 0));
     int max_global_area = 0, max_local_area;
 
@@ -67,7 +52,9 @@ int Solution::solve(vector<string> &A) {
 
     for (int j = 0; j < M; j++)
     {
+        // điểm đầu của r,g,b với đánh dấu 0,1,2 tương ứng các màu 
         vector<int> first_rgb(3, -1);
+        // điểm cuối của r,g,b với đánh dấu 0,1,2 tương ứng các màu 
         vector<int> last_rgb(3, -1);
         for (int i = 0; i < N; i++)
         {
